@@ -208,18 +208,18 @@ territoire_emprise <- function() {
 # génération des fichiers pour tex
 tex_faune <-function() {
   if ( exists("faune.spdf") ) {
-    rm(faune.spdf)
+    rm("faune.spdf")
   }
   faune_donnees <<- "txt"
   les_tex <- read.table(text="fonction|mode|args
 faune_stat_champ|ggplot|FAMILY_NAME
 faune_stat_champ|ggplot|FAMILLE
-faune_stat_champ|plotgg(4,8)|NAME_SPECIES
+faune_stat_champ|plotgg(6,12)|NAME_SPECIES
 faune_stat_champ|ggplot|ORDRE
 faune_stat_champ|ggplot|d
 faune_stat_champ|ggplot|observateur
 faune_stat_champ|print|PLACE
-faune_stat_champ|print|PRECISION
+faune_stat_champ|plotgg(4,1)|PRECISION
 faune_carte|carte|
 ", header=TRUE, sep="|", blank.lines.skip = TRUE, stringsAsFactors=FALSE, quote="")
   tex_les(les_tex)
@@ -227,13 +227,16 @@ faune_carte|carte|
 #
 # génération des fichiers pour tex
 tex_faune_prec <-function() {
+  if ( exists("faune.spdf") ) {
+    rm("faune.spdf")
+  }
   faune_donnees <<- "ogr"
   les_tex <- read.table(text="fonction|mode|args
 faune_prec_stat_champ|plotgg(4,8)|FAMILY_NAME
 faune_prec_stat_champ|plotgg(4,8)|annee
 faune_prec_stat_champ|plotgg(4,4)|mois
-faune_prec_stat_champ|plotgg(4,12)|PLACE
-faune_prec_stat_champ|plotgg(4,4)|PRECISION
+faune_prec_stat_champ|plotgg(6,16)|PLACE
+faune_prec_stat_champ|plotgg(4,1)|PRECISION
 ", header=TRUE, sep="|", blank.lines.skip = TRUE, stringsAsFactors=FALSE, quote="")
   tex_les(les_tex)
 }
@@ -269,7 +272,9 @@ serena <- function() {
 #  serena_carte()
   tex_serena()
 }
-
+#
+# un peu de nettoyage
+graphics.off()
 #
 # les commandes permettant le lancement
 Drive <- substr( getwd(),1,2)
@@ -319,8 +324,8 @@ if ( interactive() ) {
 #couches_ogr2ogr()
 #faune_plot()
 #faune_stat()
-#tex_faune()
 tex_faune()
+#tex_faune_prec()
 #faune_stat_champ('PLACE');
 #faune()
 #serena_lire()

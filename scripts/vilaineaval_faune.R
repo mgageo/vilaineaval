@@ -97,11 +97,13 @@ faune_stat_champ <- function(champ = "NAME_SPECIES") {
   nb.df <- data.frame(table(df[, champ]))
   colnames(nb.df) <- c("critere", "nb")
   print(head(nb.df,20))
+  nb <-sum(nb.df$nb)
 #
 #  print(nb.df$critere)
   p <- ggplot(data=nb.df, aes(x=critere, y=nb)) +
     coord_flip() +
     scale_x_discrete("") +
+    ylab(sprintf("nb : %s", nb)) +
     geom_bar(stat="identity", position=position_dodge(), colour="black")
   print(p)
   return(p)
@@ -117,11 +119,13 @@ faune_prec_stat_champ <- function(champ = "NAME_SPECIES") {
   nb.df <- data.frame(table(df[, champ]))
   colnames(nb.df) <- c("critere", "nb")
   print(head(nb.df,20))
+  nb <-sum(nb.df$nb)
 #
 #  print(nb.df$critere)
   p <- ggplot(data=nb.df, aes(x=critere, y=nb)) +
     coord_flip() +
     scale_x_discrete("") +
+    ylab(sprintf("nb : %s", nb)) +
     geom_bar(stat="identity", position=position_dodge(), colour="black")
   print(p)
   return(p)
