@@ -98,6 +98,8 @@ _git_lst() {
 scripts/vilaineaval.sh
 EOF
   ls -1 scripts/vilaineaval*.R >> /tmp/git.lst
+  ls -1 VILAINEAVAL/*.tex >> /tmp/git.lst
+  ls -1 VILAINEAVAL/images.pdf >> /tmp/git.lst
   cat  <<'EOF' > /tmp/README.md
 # vilaineaval : Bretagne Vivante et Rennes Vilaine Aval
 
