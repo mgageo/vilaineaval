@@ -103,7 +103,9 @@ EOF
   cat  <<'EOF' > /tmp/README.md
 # vilaineaval : Bretagne Vivante et Rennes Vilaine Aval
 
-scripts en environnement Windows 10 : MinGW R
+Scripts en environnement Windows 10 : MinGW R
+
+Ces scripts exploitenet des données en provenance des Serena et Biolovision
 EOF
 }
 [ $# -eq 0 ] && ( HELP )
