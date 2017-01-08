@@ -2,4 +2,4 @@
 
 Scripts en environnement Windows 10 : MinGW R
 
-Ces scripts exploitenet des données en provenance des Serena et Biolovision
+Ces scripts exploitent des données en provenance des bases Serena et Biolovision
