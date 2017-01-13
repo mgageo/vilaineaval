@@ -1,5 +1,9 @@
 # <!-- coding: utf-8 -->
 #
+# fonctions génériques
+# auteur : Marc Gauthier
+# licence: Creative Commons Paternité - Pas d'Utilisation Commerciale - Partage des Conditions Initiales à l'Identique 2.0 France
+#
 # sauvegarde d'un dataframe en csv
 df_ecrire <- function(df,f) {
   print(sprintf("df_ecrire() f:%s",f))

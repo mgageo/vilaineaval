@@ -1,5 +1,9 @@
 # <!-- coding: utf-8 -->
 #
+# la partie parcours
+# auteur : Marc Gauthier
+# licence: Creative Commons Paternité - Pas d'Utilisation Commerciale - Partage des Conditions Initiales à l'Identique 2.0 France
+#
 # lecture d'un fichier ogr
 parcours_get <- function(d) {
   library(RCurl)

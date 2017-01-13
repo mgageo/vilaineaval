@@ -1,6 +1,8 @@
 # <!-- coding: utf-8 -->
 #
 # la partie données faune-bretagne
+# auteur : Marc Gauthier
+# licence: Creative Commons Paternité - Pas d'Utilisation Commerciale - Partage des Conditions Initiales à l'Identique 2.0 France
 # ===============================================================
 #
 # lecture des données, export de faune-bretagne
@@ -13,45 +15,89 @@ faune_lire <- function() {
     spdf <- faune_lire_txt()
   },
   'xls' = {
-     spdf <- faune_prec_lire()
+     spdf <- faune_lire_xls()
   },
   'ogr' = {
+     spdf <- faune_lire_ogr()
+  },
+  'hiver' = {
+     spdf <- faune_lire_ogr()
+  },
+  'hiver_atlas' = {
      spdf <- faune_lire_ogr()
   }
   )
   spdf@data$observateur <- sprintf("%s %s", spdf@data$SURNAME, spdf@data$NAME)
 # la date
-  spdf@data$d <- as.Date(spdf@data$DATE, "%d.%m.%Y")
+#  spdf@data$d <- as.Date(spdf@data$DATE, "%d.%m.%Y")
+  spdf@data$d <- as.Date(as.numeric(spdf@data$DATE), origin="1899-12-30")
   inconnuDF <- subset(spdf@data, is.na(spdf@data$d))
   if ( length(inconnuDF$d) > 0 ) {
-    print(sprintf("faune_prec_lire() date invalide"))
+    print(sprintf("faune_lire() date invalide"))
     print(head(inconnuDF))
     stop("faune_lire")
   }
   spdf@data$annee <- format(spdf@data$d, "%Y")
   spdf@data$mois <- format(spdf@data$d, "%m")
+  if ( faune_donnees == "hiver" ) {
+    spdf <- faune_lire_hiver(spdf)
+  }
+  if ( faune_donnees == "hiver_atlas" ) {
+    spdf <- faune_lire_hiver(spdf)
+    spdf <- faune_lire_atlas(spdf)
+  }
   faune.spdf <<- spdf
   return(spdf)
 }
-faune_lire_txt <- function() {
-  print(sprintf("faune_lire_txt()"))
-  spdf <- faune_export_lire('geo/VILAINEAVAL/donnees.txt')
+#
+# que les données atlas
+faune_lire_atlas <- function(spdf) {
+  library("raster")
+  zone.spdf <- fonds_grille_lire()
+#  print(head(zone.spdf@data))
+  spdf@data$NUMERO <- over(spdf, zone.spdf)$NUMERO
+  df <-spdf@data
+  inconnuDF <- subset(df, is.na(df$NUMERO))
+  if ( length(inconnuDF$NUMERO) > 0 ) {
+    print(sprintf("faune_lire_atlas() maille invalide"))
+    print(head(inconnuDF))
+#    stop("faune_lire_atlas()")
+  }
+  spdf <- spdf[!(is.na(spdf@data$NUMERO)),]
+  print(sprintf("faune_lire_atlas() nrow: %d", nrow(spdf@data)))
+#  stop("***")
+  return(spdf)
+}
+# que les données en hiver
+faune_lire_hiver <- function(spdf) {
+  spdf@data$quantieme <- format(spdf@data$d, "%j")
+  date_from <- as.Date("01/12/2016", "%d/%m/%Y")
+  date_to <- as.Date("20/01/2017", "%d/%m/%Y")
+  quantieme_from <- format(date_from, "%j")
+  quantieme_to <- format(date_to, "%j")
+  spdf <- spdf[spdf@data$quantieme >= quantieme_from | spdf@data$quantieme <= quantieme_to,]
+  print(sprintf("faune_lire_hiver() nrow: %d", nrow(spdf@data)))
+#  stop("***")
+  return(spdf)
+}
+faune_lire_txt <- function(dsn='geo/VILAINEAVAL/donnees.txt') {
+  print(sprintf("faune_lire_txt() dsn: %s", dsn))
+  spdf <- faune_export_lire(dsn)
   print(sprintf("faune_lire_txt() nrow: %d", nrow(spdf@data)))
   return(spdf)
 }
-faune_lire_ogr <- function() {
-  print(sprintf("faune_lire_ogr()"))
-  spdf <- ogr_lire('geo/VILAINEAVAL/donnees_prec.geojson')
+faune_lire_ogr <- function(dsn="geo/VILAINEAVAL/donnees_prec.geojson") {
+  print(sprintf("faune_lire_ogr() dsn: %s", dsn))
+  spdf <- ogr_lire(dsn)
   print(sprintf("faune_lire_ogr() nrow: %d", nrow(spdf@data)))
   return(spdf)
 }
-faune_prec_lire <- function() {
+faune_lire_xls <- function() {
   library("xlsx")
   library("raster")
-  print(sprintf("faune_prec_lire()"))
-
   dsn <- sprintf("%s/export_07012017_073803.xls", fauneDir)
   dsn <- sprintf("%s/donnees_prec.xls", fauneDir)
+  print(sprintf("faune_lire_xls() dsn: %s", dsn))
   df <- read.xlsx2(dsn, 1, header=TRUE, colClasses=NA)
   print(head(df[,c('COORD_LAT', 'COORD_LON')]))
   df <- df[, c('ID_SIGHTING', 'ID_SPECIES', 'NAME_SPECIES', 'FAMILY_NAME', 'DATE', 'PLACE', 'MUNICIPALITY', 'INSEE', 'COORD_LAT', 'COORD_LON', 'COMMENT', 'ESTIMATION_CODE',	'TOTAL_COUNT', 'ATLAS_CODE', 'PRECISION', 'NAME', 'SURNAME')]
@@ -73,11 +119,11 @@ faune_prec_lire <- function() {
   spdf <- SpatialPointsDataFrame(df,data.frame(df[,]))
   proj4string(spdf) <- CRS("+init=epsg:4326")
   spdf <- spTransform(spdf, CRS("+init=epsg:2154"))
-  print(sprintf("faune_prec_lire() nrow: %d", nrow(spdf@data)))
+  print(sprintf("faune_lire_xls() nrow: %d", nrow(spdf@data)))
   dsn <- sprintf("%s/donnees_prec.geojson", fauneDir)
   ogr_ecrire(spdf, dsn, "donnees", driver="GeoJSON")
 #  stop("====")
-  return(spdf)
+  return()
 }
 #
 # pour faire la carte

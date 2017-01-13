@@ -1,7 +1,8 @@
 # <!-- coding: utf-8 -->
 #
 # quelques fonction pour VilaineAval
-# auteur: Marc Gauthier
+# auteur : Marc Gauthier
+# licence: Creative Commons Paternité - Pas d'Utilisation Commerciale - Partage des Conditions Initiales à l'Identique 2.0 France
 #
 #
 #243500139;communauté d’agglomération de Rennes Métropole
@@ -206,9 +207,11 @@ territoire_emprise <- function() {
 }
 #
 # génération des fichiers pour tex
+# ================================
+# les données 2016-2017
 tex_faune <-function() {
   if ( exists("faune.spdf") ) {
-    rm("faune.spdf")
+    rm("faune.spdf", pos = ".GlobalEnv")
   }
   faune_donnees <<- "txt"
   les_tex <- read.table(text="fonction|mode|args
@@ -220,28 +223,60 @@ faune_stat_champ|ggplot|d
 faune_stat_champ|ggplot|observateur
 faune_stat_champ|print|PLACE
 faune_stat_champ|plotgg(4,1)|PRECISION
-faune_carte|carte|
+#faune_carte|carte|
 ", header=TRUE, sep="|", blank.lines.skip = TRUE, stringsAsFactors=FALSE, quote="")
   tex_les(les_tex)
 }
 #
-# génération des fichiers pour tex
+# les hivers pour les données précédentes
+tex_faune_hiver <-function() {
+  if ( exists("faune.spdf") ) {
+    rm("faune.spdf", pos = ".GlobalEnv")
+  }
+  faune_donnees <<- "hiver"
+  les_tex <- read.table(text="fonction|mode|args
+faune_stat_champ|plotgg(4,8)|FAMILY_NAME
+faune_stat_champ|plotgg(4,8)|annee
+faune_stat_champ|plotgg(4,2)|mois
+faune_stat_champ|plotgg(6,16)|PLACE
+faune_stat_champ|plotgg(4,1)|PRECISION
+", header=TRUE, sep="|", blank.lines.skip = TRUE, stringsAsFactors=FALSE, quote="")
+  tex_les(les_tex, "_hiver")
+}
+#
+# les hivers et sur les mailles pour les données précédentes
+tex_faune_hiver_atlas <-function() {
+  if ( exists("faune.spdf") ) {
+    rm("faune.spdf", pos = ".GlobalEnv")
+  }
+  faune_donnees <<- "hiver_atlas"
+  les_tex <- read.table(text="fonction|mode|args
+faune_stat_champ|plotgg(4,8)|FAMILY_NAME
+faune_stat_champ|plotgg(4,8)|annee
+faune_stat_champ|plotgg(4,2)|mois
+faune_stat_champ|plotgg(6,16)|PLACE
+faune_stat_champ|plotgg(4,1)|PRECISION
+", header=TRUE, sep="|", blank.lines.skip = TRUE, stringsAsFactors=FALSE, quote="")
+  tex_les(les_tex, "_hiver_atlas")
+}
+#
+# les données précédentes
 tex_faune_prec <-function() {
   if ( exists("faune.spdf") ) {
-    rm("faune.spdf")
+    rm("faune.spdf", pos = ".GlobalEnv")
   }
   faune_donnees <<- "ogr"
   les_tex <- read.table(text="fonction|mode|args
-faune_prec_stat_champ|plotgg(4,8)|FAMILY_NAME
-faune_prec_stat_champ|plotgg(4,8)|annee
-faune_prec_stat_champ|plotgg(4,4)|mois
-faune_prec_stat_champ|plotgg(6,16)|PLACE
-faune_prec_stat_champ|plotgg(4,1)|PRECISION
+faune_stat_champ|plotgg(4,8)|FAMILY_NAME
+faune_stat_champ|plotgg(4,8)|annee
+faune_stat_champ|plotgg(4,4)|mois
+faune_stat_champ|plotgg(6,16)|PLACE
+faune_stat_champ|plotgg(4,1)|PRECISION
 ", header=TRUE, sep="|", blank.lines.skip = TRUE, stringsAsFactors=FALSE, quote="")
-  tex_les(les_tex)
+  tex_les(les_tex, "_prec")
 }
-# génération des fichiers pour tex
-tex_serena <-function() {
+# les données serena
+tex_serena <- function() {
   les_tex <- read.table(text="fonction|mode|args
 serena_stat_champ|plotgg(4,8)|espece
 serena_stat_champ|ggplot|OBSE_DATE
@@ -261,6 +296,9 @@ parcours_stat_email_longueur|ggplot|
 }
 faune <- function() {
   tex_faune()
+  tex_faune_prec()
+  tex_faune_hiver()
+  tex_faune_hiver_atlas()
 }
 parcours <- function() {
   parcours_get()
@@ -324,12 +362,14 @@ if ( interactive() ) {
 #couches_ogr2ogr()
 #faune_plot()
 #faune_stat()
-tex_faune()
+#tex_faune_hiver()
+#tex_faune_hiver_atlas()
 #tex_faune_prec()
 #faune_stat_champ('PLACE');
-#faune()
+#faune_lire_xls()
+#parcours()
 #serena_lire()
-#serena_maille()
+serena_maille()
 #serena_carte_stat()
 #serena_stat_champ()
 #serena_atlas_especes()

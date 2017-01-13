@@ -1,15 +1,22 @@
 # <!-- coding: utf-8 -->
 #
 # la partie données serena
+# auteur : Marc Gauthier
+# licence: Creative Commons Paternité - Pas d'Utilisation Commerciale - Partage des Conditions Initiales à l'Identique 2.0 France
 # ===============================================================
 #
 # lecture des données, export de serena en format excel
 serena_lire <- function() {
   library("xlsx")
   library("raster")
+  if ( exists("serena.spdf") ) {
+    return(serena.spdf)
+  }
   dsn <- sprintf("%s/serena_20161222.xls", serenaDir)
   dsn <- sprintf("%s/serena_20170102.xls", serenaDir)
-  df <- read.xlsx2(dsn, 1, header=TRUE, colClasses=NA)
+  dsn <- sprintf("%s/serena_20170109.xls", serenaDir)
+  print(sprintf("serena_lire() dsn: %s", dsn))
+  df <- read.xlsx(dsn, 1, header=TRUE, colClasses=NA)
   df$OBSE_LON <- as.numeric(gsub(",", ".", df$OBSE_LON))
   df$OBSE_LAT <- as.numeric(gsub(",", ".", df$OBSE_LAT))
 #  print(head(df))
@@ -18,6 +25,8 @@ serena_lire <- function() {
   spdf <- SpatialPointsDataFrame(df,data.frame(df[,]))
   proj4string(spdf) <- CRS("+init=epsg:4326")
   spdf <- spTransform(spdf, CRS("+init=epsg:2154"))
+  serena.spdf <<- spdf
+  print(sprintf("serena_lire() nrow: %d", nrow(spdf@data)))
   return(spdf)
 }
 #
@@ -48,10 +57,17 @@ serena_maille <- function() {
   if ( length(inconnuDF$NUMERO) > 0 ) {
     print(sprintf("donnees_maille() maille invalide"))
     print(head(inconnuDF))
-#    stop("serena_maille()")
+    stop("serena_maille()")
   }
+
   df <- df[!(is.na(df$NUMERO)),]
   print(head(df))
+  inconnuDF <- subset(df, df$NUMERO != df$place)
+  if ( length(inconnuDF$NUMERO) > 0 ) {
+    print(sprintf("donnees_maille() maille invalide"))
+    print(head(inconnuDF[, c("OBSE_ID", "TAXO_VERNACUL", "OBSE_PLACE")]))
+    stop("serena_maille() NUMERO#place")
+  }
   mailles_especes.df <- sqldf("SELECT NUMERO, TAXO_VERNACUL, COUNT(*) as nb FROM df GROUP BY NUMERO, TAXO_VERNACUL;")
   mailles_especes.df$TAXO_VERNACUL <- iconv(mailles_especes.df$TAXO_VERNACUL, "UTF-8")
   champs <- c("NUMERO", "TAXO_VERNACUL")

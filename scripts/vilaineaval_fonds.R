@@ -1,6 +1,8 @@
 # <!-- coding: utf-8 -->
 #
 # la partie fonds de carte
+# auteur : Marc Gauthier
+# licence: Creative Commons Paternité - Pas d'Utilisation Commerciale - Partage des Conditions Initiales à l'Identique 2.0 France
 
 fonds_raster <- function() {
   require(raster)
